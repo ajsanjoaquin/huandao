@@ -1,0 +1,10 @@
+{
+  "_comment": "Manual GPS overrides for photos that have no EXIF and no track match.",
+  "_format": "{ \"IMG_filename.jpg\": { \"lat\": 25.04, \"lng\": 121.03, \"day_index\": 1 } }",
+
+  "example_photo.jpg": {
+    "lat": 25.0478,
+    "lng": 121.0312,
+    "day_index": 1
+  }
+}
