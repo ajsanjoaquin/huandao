@@ -73,6 +73,7 @@ def main():
     parser.add_argument("--photos-zip", help="Path to Google Photos album ZIP file")
     parser.add_argument("--photos-dir", help="Path to directory of photo files")
     parser.add_argument("--skip-exif", action="store_true", help="Skip EXIF GPS extraction (faster)")
+    parser.add_argument("--skip-garmin", action="store_true", help="Skip Garmin fetch, use cached activities and GPX files")
     args = parser.parse_args()
 
     force = args.force_refresh
@@ -83,11 +84,15 @@ def main():
 
     # Phase 1: Garmin
     print("\n── Phase 1: Garmin Connect ─────────────────────────────────────────")
-    activities = garmin_fetcher.fetch_activities(start, end, force_refresh=force)
-    print(f"  {len(activities)} cycling activities found")
-
-    gpx_paths = garmin_fetcher.fetch_all_gpx(activities, force_refresh=force)
-    print(f"  {len(gpx_paths)} GPX files ready")
+    if args.skip_garmin:
+        activities = garmin_fetcher.fetch_activities(start, end, force_refresh=False)
+        gpx_paths = garmin_fetcher.fetch_all_gpx(activities, force_refresh=False)
+        print(f"  Skipped fetch — using cache: {len(activities)} activities, {len(gpx_paths)} GPX files")
+    else:
+        activities = garmin_fetcher.fetch_activities(start, end, force_refresh=force)
+        print(f"  {len(activities)} cycling activities found")
+        gpx_paths = garmin_fetcher.fetch_all_gpx(activities, force_refresh=force)
+        print(f"  {len(gpx_paths)} GPX files ready")
 
     # Phase 2: Photos
     photos_raw = []
@@ -136,6 +141,12 @@ def main():
             photos_raw, days, use_exif=not args.skip_exif
         )
         print(f"  Geotagged {len(geotagged)} / {len(photos_raw)} photos")
+
+        # Only include photos whose thumbnail file actually exists on disk.
+        # This keeps photos.json in sync even when select_photos.py has culled files.
+        geotagged = [p for p in geotagged
+                     if (Path("web/public") / p["thumb_url"].lstrip("/")).exists()]
+        print(f"  Thumbnail files present: {len(geotagged)}")
 
         photos_out = {"photos": geotagged}
         photos_path = OUT_DIR / "photos.json"

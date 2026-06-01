@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Randomly keep 50% of photos.
+Randomly keep KEEP_FRACTION% of photos.
 Rebuilds photos.json from the full pipeline cache so all kept photos
 have complete metadata regardless of previous runs of this script.
 """
@@ -12,7 +12,7 @@ from pathlib import Path
 PHOTOS_DIR = Path("web/public/photos")
 PHOTOS_JSON = Path("web/public/data/photos.json")
 CACHE_JSON = Path("cache/photos_raw.json")
-KEEP_FRACTION = 0.95
+KEEP_FRACTION = 0.25
 SEED = 42  # fixed seed — re-runs produce the same selection
 
 # Load full geotagged metadata from the pipeline output
