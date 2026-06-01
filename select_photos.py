@@ -12,7 +12,7 @@ from pathlib import Path
 PHOTOS_DIR = Path("web/public/photos")
 PHOTOS_JSON = Path("web/public/data/photos.json")
 CACHE_JSON = Path("cache/photos_raw.json")
-KEEP_FRACTION = 0.5
+KEEP_FRACTION = 0.95
 SEED = 42  # fixed seed — re-runs produce the same selection
 
 # Load full geotagged metadata from the pipeline output
