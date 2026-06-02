@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTrackData } from "./hooks/useTrackData";
 import { usePhotoData } from "./hooks/usePhotoData";
 import { useActiveDay } from "./hooks/useActiveDay";
@@ -11,6 +11,7 @@ export default function App() {
   const { data: trackData, error: trackError } = useTrackData();
   const { photos, error: photoError } = usePhotoData();
   const { activeDayIndex, activePhoto, selectDay, clearDay, setActivePhoto } = useActiveDay();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (trackData?.trip?.title) document.title = trackData.trip.title;
@@ -38,6 +39,11 @@ export default function App() {
     ? photos.filter((p) => p.day_index === activeDay.day_index)
     : photos;
 
+  const handleSelectDay = (dayIndex) => {
+    selectDay(dayIndex);
+    setSidebarOpen(false);
+  };
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-forest-900">
       {/* Sidebar */}
@@ -46,13 +52,25 @@ export default function App() {
         days={days}
         activeDayIndex={activeDayIndex}
         dayPhotos={visiblePhotos}
-        onSelectDay={selectDay}
+        onSelectDay={handleSelectDay}
         onClearDay={clearDay}
         onPhotoClick={setActivePhoto}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       {/* Main content: map + elevation */}
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex flex-col flex-1 overflow-hidden relative">
+        {/* Mobile nav toggle */}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open day list"
+          className="md:hidden absolute top-3 left-3 z-10 flex items-center gap-2 bg-forest-800/90 text-seafoam-200 text-sm font-medium rounded-lg px-3 py-2 border border-forest-600"
+        >
+          <span className="text-base leading-none">☰</span>
+          <span>{activeDayIndex != null ? `Day ${activeDayIndex}` : "Days"}</span>
+        </button>
+
         <div className="flex-1 min-h-0">
           <MapView
             days={days}

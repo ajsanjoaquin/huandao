@@ -1,8 +1,9 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import PhotoStrip from "./PhotoStrip";
 
 export default function PhotoModal({ photo, dayPhotos, onClose, onNavigate }) {
   const currentIndex = dayPhotos.findIndex((p) => p.id === photo.id);
+  const touchStartX = useRef(null);
 
   const goNext = useCallback(() => {
     if (currentIndex < dayPhotos.length - 1) onNavigate(dayPhotos[currentIndex + 1]);
@@ -22,6 +23,20 @@ export default function PhotoModal({ photo, dayPhotos, onClose, onNavigate }) {
     return () => window.removeEventListener("keydown", handler);
   }, [onClose, goNext, goPrev]);
 
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) goNext();
+      else goPrev();
+    }
+    touchStartX.current = null;
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center"
@@ -30,24 +45,29 @@ export default function PhotoModal({ photo, dayPhotos, onClose, onNavigate }) {
       {/* Close */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 text-white/70 hover:text-white text-2xl leading-none transition-colors"
+        aria-label="Close"
+        className="absolute top-3 right-3 w-11 h-11 flex items-center justify-center bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors text-lg"
       >
         ✕
       </button>
 
       {/* Main image */}
-      <div className="relative max-w-4xl w-full mx-4 flex-shrink">
+      <div
+        className="relative max-w-4xl w-full mx-4 flex-shrink"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <img
           src={photo.thumb_url.replace("w400", "w1200")}
           alt={photo.filename}
-          className="max-h-[70vh] w-full object-contain rounded-lg"
+          className="max-h-[75vh] w-full object-contain rounded-lg"
         />
 
         {/* Prev / Next */}
         {currentIndex > 0 && (
           <button
             onClick={goPrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-12 h-12 flex items-center justify-center transition-colors text-2xl"
           >
             ‹
           </button>
@@ -55,7 +75,7 @@ export default function PhotoModal({ photo, dayPhotos, onClose, onNavigate }) {
         {currentIndex < dayPhotos.length - 1 && (
           <button
             onClick={goNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-12 h-12 flex items-center justify-center transition-colors text-2xl"
           >
             ›
           </button>

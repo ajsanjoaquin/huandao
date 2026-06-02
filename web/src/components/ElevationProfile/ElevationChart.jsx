@@ -62,12 +62,11 @@ export default function ElevationChart({ profile }) {
   const viewBox = `0 0 ${innerW + PADDING.left + PADDING.right} ${CHART_HEIGHT}`;
 
   return (
-    <div className="relative bg-forest-800/90 backdrop-blur border-t border-forest-600">
+    <div className="relative bg-forest-800/90 backdrop-blur border-t border-forest-600 h-16 md:h-[120px]">
       <svg
         ref={svgRef}
         viewBox={viewBox}
-        className="w-full"
-        style={{ height: CHART_HEIGHT }}
+        className="w-full h-full"
         preserveAspectRatio="none"
         onMouseMove={handleMouseMove}
         onMouseLeave={() => setTooltip(null)}
