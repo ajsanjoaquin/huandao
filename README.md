@@ -2,7 +2,7 @@
 
 Interactive map of a Taiwan circumnavigation bike trip.
 
-**Live site: [https://web-kohl-nine-66.vercel.app](https://web-kohl-nine-66.vercel.app)**
+**Live site: [https://web-kohl-nine-66.vercel.app](https://aj-crew-huandao.vercel.app/)**
 
 ## What it shows
 
